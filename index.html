@@ -105,7 +105,7 @@
             top: 0;
             left: 0;
             padding-top: 38px;
-            padding-bottom: 65px;
+            padding-bottom: 60px;
             background: var(--bg-app);
             overflow: hidden;
         }
@@ -148,7 +148,6 @@
             border-radius: 4px;
         }
 
-        /* Home Screen Elements */
         .user-welcome-card {
             background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
             color: white;
@@ -213,6 +212,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
+            margin-top: 10px;
         }
 
         .section-title {
@@ -237,6 +237,7 @@
             cursor: pointer;
             transition: border-color 0.2s;
             box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            position: relative;
         }
 
         .incident-card:hover {
@@ -297,7 +298,6 @@
             padding-top: 6px;
         }
 
-        /* Form Controls & Inputs */
         .form-group {
             margin-bottom: 14px;
         }
@@ -335,7 +335,7 @@
         .upload-box {
             border: 2px dashed var(--border);
             border-radius: 10px;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
             background: var(--card-bg);
             cursor: pointer;
@@ -357,6 +357,21 @@
             color: var(--text-muted);
         }
 
+        .preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .preview-thumb {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+        }
+
         .btn-primary {
             width: 100%;
             background: var(--primary);
@@ -375,11 +390,8 @@
             background: #0369a1;
         }
 
-        /* Map Screen Simulation */
         .map-view-box {
             width: 100%;
-            height: 220px;
-            background: #e2e8f0;
             border-radius: 12px;
             position: relative;
             overflow: hidden;
@@ -390,66 +402,6 @@
             margin-bottom: 14px;
         }
 
-        .map-bg {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.75;
-        }
-
-        .map-pin {
-            position: absolute;
-            background: var(--danger);
-            color: white;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            box-shadow: 0 4px 10px rgba(220, 38, 38, 0.4);
-            cursor: pointer;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
-            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
-        }
-
-        /* Dashboard Screen Stats */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 14px;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .stat-value {
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .stat-label {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        /* Bottom Nav */
         .bottom-nav {
             position: absolute;
             bottom: 0;
@@ -484,7 +436,6 @@
             color: var(--primary);
         }
 
-        /* Alert Toast */
         .toast {
             position: absolute;
             top: 50px;
@@ -518,7 +469,7 @@
     <div class="phone">
         <div class="notch"></div>
         <div class="status-bar">
-            <span id="current-time">19:30</span>
+            <span id="realtime-clock">00:00</span>
             <div>
                 <i class="fa-solid fa-signal"></i>
                 <i class="fa-solid fa-wifi" style="margin-left: 5px;"></i>
@@ -541,7 +492,7 @@
                 </div>
 
                 <div class="quick-actions">
-                    <div class="action-btn" onclick="switchScreen('screen-report')">
+                    <div class="action-btn" onclick="openReportFormForAdd()">
                         <i class="fa-solid fa-camera-retro"></i>
                         <span>แจ้งจุดน้ำท่วม</span>
                     </div>
@@ -564,53 +515,28 @@
                     <span class="section-link" onclick="switchScreen('screen-status')">ดูทั้งหมด</span>
                 </div>
 
-                <div id="home-incident-list">
-                    <!-- รายการจำลอง (Dynamic via JS) -->
-                    <div class="incident-card" onclick="switchScreen('screen-detail')">
-                        <div class="incident-header">
-                            <span class="incident-title">น้ำเอ่อล้นตลิ่งสูง 30 ซม.</span>
-                            <span class="status-badge danger">วิกฤต/รอสูบน้ำ</span>
-                        </div>
-                        <div class="incident-loc">
-                            <i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> ชุมชนป่ามะม่วง (ริมแม่น้ำน่าน)
-                        </div>
-                        <div class="incident-footer">
-                            <span>รหัส: #PLK-FLD-051</span>
-                            <span>15 นาทีที่แล้ว</span>
-                        </div>
-                    </div>
-
-                    <div class="incident-card" onclick="switchScreen('screen-detail')">
-                        <div class="incident-header">
-                            <span class="incident-title">น้ำท่วมขังผิวจราจร (รอการระบาย)</span>
-                            <span class="status-badge warning">เฝ้าระวัง</span>
-                        </div>
-                        <div class="incident-loc">
-                            <i class="fa-solid fa-location-dot" style="color: var(--warning);"></i> ถนนสิงหวัฒน์ (หน้าห้างดัง)
-                        </div>
-                        <div class="incident-footer">
-                            <span>รหัส: #PLK-FLD-050</span>
-                            <span>1 ชั่วโมงที่แล้ว</span>
-                        </div>
-                    </div>
-                </div>
+                <div id="home-incident-list"></div>
             </div>
         </div>
 
-        <!-- 2. หน้าแจ้งเหตุ / รายงานจุดเสี่ยงน้ำท่วม (Report Screen) -->
+        <!-- 2. หน้าแจ้งเหตุ / รายงานจุดเสี่ยงน้ำท่วม -->
         <div id="screen-report" class="screen-view">
             <div class="app-header">
                 <i class="fa-solid fa-chevron-left" onclick="switchScreen('screen-home')" style="cursor: pointer;"></i>
-                <div class="logo-text">แจ้งจุดเสี่ยงน้ำท่วม</div>
+                <div class="logo-text" id="report-header-title">แจ้งจุดเสี่ยงน้ำท่วม</div>
                 <div style="width: 16px;"></div>
             </div>
             <div class="screen-body">
+                <input type="hidden" id="edit-index" value="-1">
+                
                 <div class="form-group">
                     <label class="form-label">1. ถ่ายภาพสถานการณ์น้ำ / ระดับน้ำ</label>
-                    <div class="upload-box" onclick="showToast('เปิดกล้องถ่ายภาพน้ำท่วมสำเร็จ')">
+                    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleImageUpload(event)">
+                    <div class="upload-box" onclick="document.getElementById('cameraInput').click()">
                         <i class="fa-solid fa-camera"></i>
-                        <p>แตะเพื่อถ่ายภาพหรือแนบภาพสภาพน้ำท่วม</p>
+                        <p>แตะเพื่อเปิดกล้องหรือเลือกไฟล์รูปภาพ</p>
                     </div>
+                    <div id="imagePreviewContainer" class="preview-container"></div>
                 </div>
 
                 <div class="form-group">
@@ -624,124 +550,97 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">3. ระบุพิกัด / จุดเกิดเหตุในพิษณุโลก</label>
-                    <input type="text" class="form-control" id="report-loc" value="ชุมชนท่า âม้า / ถนนเอกาทศรถ">
+                    <label class="form-label">3. ชื่อสถานที่ / จุดเกิดเหตุ</label>
+                    <input type="text" class="form-control" id="report-loc" placeholder="เช่น ชุมชนท่ามา้า / ถนนเอกาทศรถ">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">4. รายละเอียดเพิ่มเติม (ความลึกโดยประมาณ)</label>
-                    <textarea class="form-control" id="report-desc" placeholder="เช่น ระดับน้ำสูงประมาณ 20-30 ซม. รถเก๋งควรหลีกเลี่ยงเส้นทางนี้..."></textarea>
+                    <label class="form-label">4. พิกัดแผนที่ (Latitude, Longitude สำหรับเปิด Google Maps)</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" class="form-control" id="report-lat" placeholder="Latitude เช่น 16.8214">
+                        <input type="text" class="form-control" id="report-lng" placeholder="Longitude เช่น 100.2655">
+                    </div>
                 </div>
 
-                <button class="btn-primary" onclick="submitReport()">ส่งรายงานสถานการณ์น้ำ</button>
+                <div class="form-group">
+                    <label class="form-label">5. รายละเอียดเพิ่มเติม</label>
+                    <textarea class="form-control" id="report-desc" placeholder="เช่น ระดับน้ำสูงประมาณ 20-30 ซม. รถเก๋งควรหลีกเลี่ยง..."></textarea>
+                </div>
+
+                <button class="btn-primary" onclick="submitReport()">รายงานสถานการณ์น้ำ</button>
             </div>
         </div>
 
-        <!-- 3. หน้าแผนที่จุดเสี่ยงน้ำท่วม (Map Screen) -->
+        <!-- 3. หน้าแผนที่จุดเสี่ยงน้ำท่วม -->
         <div id="screen-map" class="screen-view">
             <div class="app-header">
                 <i class="fa-solid fa-chevron-left" onclick="switchScreen('screen-home')" style="cursor: pointer;"></i>
                 <div class="logo-text">แผนที่จุดเสี่ยงน้ำท่วมเมือง</div>
-                <i class="fa-solid fa-filter" style="cursor: pointer; font-size: 0.9rem;" onclick="showToast('กรองเฉพาะจุดวิกฤตน้ำท่วมสูง')"></i>
+                <i class="fa-solid fa-filter" style="cursor: pointer; font-size: 0.9rem;" onclick="showToast('แสดงจุดเสี่ยงทั้งหมดในระบบ')"></i>
             </div>
             <div class="screen-body">
-                <div class="map-view-box">
-                    <!-- รูปจำลองแผนที่เมืองพิษณุโลก (แม่น้ำน่านผ่ากลาง) -->
-                    <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=600&q=80" alt="Phitsanulok Map" class="map-bg">
-                    <div class="map-pin" style="top: 35%; left: 45%;" onclick="showToast('จุดวิกฤต: ชุมชนป่ามะม่วง (ระดับน้ำ 30 ซม.)')"><i class="fa-solid fa-water"></i></div>
-                    <div class="map-pin" style="top: 55%; left: 60%; background: var(--warning);" onclick="showToast('จุดเฝ้าระวัง: ถนนสิงหวัฒน์ (น้ำขังรอระบาย)')"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    <div class="map-pin" style="top: 65%; left: 30%; background: var(--success);" onclick="showToast('จุดปกติ: บริเวณตลาด, ระบายน้ำปกติ')"><i class="fa-solid fa-check"></i></div>
+                <div class="map-view-box" style="background: #1e293b; flex-direction: column; padding: 15px; text-align: center; color: white;">
+                    <i class="fa-solid fa-map-location-dot" style="font-size: 2.5rem; color: var(--primary-light); margin-bottom: 8px;"></i>
+                    <div style="font-size: 0.85rem; font-weight: 700; margin-bottom: 4px;">ระบบแผนที่พิกัดน้ำท่วมพิษณุโลก</div>
+                    <div style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 12px;">คลิกเลือกจุดเสี่ยงด้านล่างเพื่อเปิดนำทางผ่าน Google Maps แยกรายพิกัด</div>
                 </div>
 
                 <div class="section-header">
-                    <span class="section-title">สถานะแม่น้ำน่าน (เขตเทศบาล)</span>
+                    <span class="section-title">พิกัดจุดเสี่ยงทั้งหมด (คลิกเพื่อเปิดแผนที่)</span>
                 </div>
-                <div class="incident-card" style="border-left: 4px solid var(--danger);">
-                    <div class="incident-title">สถานีวัดน้ำ N.5A (สะพานนเรศวร)</div>
-                    <div class="incident-loc" style="margin-top: 4px; margin-bottom: 0;">ระดับน้ำ: 7.20 ม. (ต่ำกว่าตลิ่ง 1.30 ม. - เฝ้าระวัง)</div>
-                </div>
+
+                <div id="map-incident-list"></div>
             </div>
         </div>
 
-        <!-- 4. หน้าติดตามสถานะ (Status Screen) -->
+        <!-- 4. หน้าติดตามสถานะ / จัดการข้อมูล -->
         <div id="screen-status" class="screen-view">
             <div class="app-header">
                 <i class="fa-solid fa-chevron-left" onclick="switchScreen('screen-home')" style="cursor: pointer;"></i>
-                <div class="logo-text">ติดตามการช่วยเหลือและสูบน้ำ</div>
+                <div class="logo-text">ติดตามสถานะและจัดการเคส</div>
                 <div style="width: 16px;"></div>
             </div>
             <div class="screen-body">
-                <div id="full-incident-list">
-                    <div class="incident-card" onclick="switchScreen('screen-detail')">
-                        <div class="incident-header">
-                            <span class="incident-title">น้ำเอ่อล้นตลิ่ง 30 ซม.</span>
-                            <span class="status-badge danger">กำลังติดตั้งเครื่องสูบน้ำ</span>
-                        </div>
-                        <div class="incident-loc"><i class="fa-solid fa-location-dot"></i> ชุมชนป่ามะม่วง</div>
-                        <div class="incident-footer"><span>หน่วยงาน: เทศบาลนครพิษณุโลก</span><span>วันนี้</span></div>
-                    </div>
-                    <div class="incident-card" onclick="switchScreen('screen-detail')">
-                        <div class="incident-header">
-                            <span class="incident-title">น้ำท่วมขังผิวจราจร</span>
-                            <span class="status-badge warning">กำลังระบายน้ำ</span>
-                        </div>
-                        <div class="incident-loc"><i class="fa-solid fa-location-dot"></i> ถนนสิงหวัฒน์</div>
-                        <div class="incident-footer"><span>หน่วยงาน: แขวงทางหลวงพิษณุโลก</span><span>เมื่อวาน</span></div>
-                    </div>
-                    <div class="incident-card" onclick="switchScreen('screen-detail')">
-                        <div class="incident-header">
-                            <span class="incident-title">ท่อระบายน้ำอุดตัน</span>
-                            <span class="status-badge success">แก้ไขเรียบร้อย</span>
-                        </div>
-                        <div class="incident-loc"><i class="fa-solid fa-location-dot"></i> ย่านตลาด OTOP</div>
-                        <div class="incident-footer"><span>ลอกท่อระบายน้ำเสร็จสิ้น</span><span>2 วันก่อน</span></div>
-                    </div>
+                <div class="section-header">
+                    <span class="section-title">รายการแจ้งเหตุทั้งหมด (บันทึกถาวรในเครื่อง)</span>
                 </div>
+                <div id="full-incident-list"></div>
             </div>
         </div>
 
-        <!-- 5. หน้าแดชบอร์ดสถิติ (Analytics Screen) -->
+        <!-- 5. หน้าแดชบอร์ดสถิติ -->
         <div id="screen-analytics" class="screen-view">
             <div class="app-header">
                 <i class="fa-solid fa-chevron-left" onclick="switchScreen('screen-home')" style="cursor: pointer;"></i>
-                <div class="logo-text">สถิติอุทกภัยเมืองพิษณุโลก</div>
+                <div class="logo-text">สถิติน้ำและอุทกภัยเมืองพิษณุโลก</div>
                 <div style="width: 16px;"></div>
             </div>
             <div class="screen-body">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value">48 จุด</div>
-                        <div class="stat-label">จุดเสี่ยงทั้งหมดในเมือง</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" style="color: var(--success);">88%</div>
-                        <div class="stat-label">ระบายน้ำเข้าสู่ภาวะปกติ</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" style="color: var(--warning);">4 เครื่อง</div>
-                        <div class="stat-label">เครื่องสูบน้ำกำลังทำงาน</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" style="color: var(--primary);">N.5A</div>
-                        <div class="stat-label">จุดวัดน้ำหลักเมืองพิษณุโลก</div>
-                    </div>
+                <div class="user-welcome-card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+                    <h3>สถานีวัดน้ำแม่น้ำน่าน (N.5A)</h3>
+                    <p>สะพานนเรศวร / สะพานเอกาทศรถ อ.เมือง จ.พิษณุโลก ระดับน้ำปกติ ตลิ่งปลอดภัย</p>
                 </div>
 
                 <div class="section-header">
-                    <span class="section-title">สัดส่วนพื้นที่แจ้งเหตุในเขตเมือง</span>
+                    <span class="section-title">🚨 จุดเสี่ยงอุทกภัยในเขตเมือง (3 จุดหลัก)</span>
+                    <span class="section-link" onclick="openReportFormForAdd()">+ เพิ่มจุดเสี่ยง</span>
                 </div>
-                <div class="incident-card">
-                    <div style="font-size: 0.75rem; font-weight: 600; margin-bottom: 6px;">🌊 ชุมชนริมแม่น้ำน่าน / ที่ลุ่มต่ำ (50%)</div>
-                    <div style="width: 100%; background: var(--border); height: 8px; border-radius: 4px; overflow: hidden;">
-                        <div style="width: 50%; background: var(--danger); height: 100%;"></div>
-                    </div>
+                <div id="analytics-risk-list"></div>
+
+                <div class="section-header" style="margin-top: 16px;">
+                    <span class="section-title">⚙️ เครื่องสูบน้ำกำลังทำงาน (4 จุดหลัก)</span>
                 </div>
-                <div class="incident-card">
-                    <div style="font-size: 0.75rem; font-weight: 600; margin-bottom: 6px;">🛣️ พื้นที่ผิวจราจรน้ำรอระบาย (35%)</div>
-                    <div style="width: 100%; background: var(--border); height: 8px; border-radius: 4px; overflow: hidden;">
-                        <div style="width: 35%; background: var(--warning); height: 100%;"></div>
-                    </div>
+                <div id="analytics-pumps-list"></div>
+
+                <div class="section-header" style="margin-top: 16px;">
+                    <span class="section-title">📍 จุดวัดน้ำหลักเมืองพิษณุโลก</span>
                 </div>
+                <div id="analytics-water-stations"></div>
+
+                <div class="section-header" style="margin-top: 16px;">
+                    <span class="section-title">📊 สัดส่วนพื้นที่แจ้งเหตุในเขตเมือง (ปัจจุบัน)</span>
+                </div>
+                <div id="analytics-zone-ratio"></div>
             </div>
         </div>
 
@@ -749,34 +648,19 @@
         <div id="screen-detail" class="screen-view">
             <div class="app-header">
                 <i class="fa-solid fa-chevron-left" onclick="switchScreen('screen-status')" style="cursor: pointer;"></i>
-                <div class="logo-text">รายละเอียดเคส #PLK-FLD-051</div>
+                <div class="logo-text">รายละเอียดเคสและหน่วยงานช่วยเหลือ</div>
                 <div style="width: 16px;"></div>
             </div>
-            <div class="screen-body">
-                <div style="background: #cbd5e1; height: 160px; border-radius: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 0.8rem; font-weight: 600;">
-                    [รูปภาพหน้างานจริง: น้ำเอ่อล้นตลิ่งป่ามะม่วง]
-                </div>
-                <div style="font-size: 0.85rem; font-weight: 700; margin-bottom: 4px;">น้ำเอ่อล้นตลิ่งเข้าท่วมพื้นที่ชุมชน</div>
-                <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 12px;"><i class="fa-solid fa-location-dot"></i> ชุมชนป่ามะม่วง (ริมแม่น้ำน่าน)</div>
-                
-                <div class="form-group" style="background: var(--card-bg); padding: 12px; border-radius: 10px; border: 1px solid var(--border);">
-                    <div style="font-size: 0.75rem; font-weight: 700; margin-bottom: 8px; color: var(--primary);">ไทม์ไลน์การช่วยเหลือ</div>
-                    <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 6px;">🟢 [18:00] ประชาชนแจ้งพิกัดน้ำท่วมเข้าสู่ระบบ</div>
-                    <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 6px;">🔵 [18:30] เทศบาลนครพิษณุโลกส่งเจ้าหน้าที่เข้าสำรวจ</div>
-                    <div style="font-size: 0.7rem; color: var(--text-muted);">⏳ [กำลังดำเนินการ] ติดตั้งเครื่องสูบน้ำเพิ่มเติม</div>
-                </div>
-
-                <button class="btn-primary" onclick="showToast('ส่งขอความช่วยเหลือเร่งด่วนไปยัง ปภ.พิษณุโลก แล้ว')">แจ้งขอความช่วยเหลือเร่งด่วน</button>
-            </div>
+            <div class="screen-body" id="detail-content-box"></div>
         </div>
 
-        <!-- แถบเมนูด้านล่าง (Bottom Navigation) -->
+        <!-- แถบเมนูด้านล่าง -->
         <div class="bottom-nav">
             <div class="nav-item active" id="nav-home" onclick="switchScreen('screen-home'); updateNav('nav-home');">
                 <i class="fa-solid fa-house"></i>
                 <span>หน้าแรก</span>
             </div>
-            <div class="nav-item" id="nav-report" onclick="switchScreen('screen-report'); updateNav('nav-report');">
+            <div class="nav-item" id="nav-report" onclick="openReportFormForAdd(); updateNav('nav-report');">
                 <i class="fa-solid fa-camera"></i>
                 <span>แจ้งน้ำท่วม</span>
             </div>
@@ -796,6 +680,172 @@
     </div>
 
     <script>
+        function updateRealtimeClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const clockEl = document.getElementById('realtime-clock');
+            if (clockEl) clockEl.innerText = `${hours}:${minutes}`;
+        }
+        setInterval(updateRealtimeClock, 1000);
+
+        const STORAGE_KEY = 'phitsanulok_flood_incidents_v4';
+        
+        let defaultIncidents = [
+            {
+                id: 'PLK-FLD-051',
+                type: 'น้ำเอ่อล้นตลิ่งเข้าท่วมบ้านเรือน/ชุมชน',
+                loc: 'ชุมชนป่ามะม่วง (ริมแม่น้ำน่าน)',
+                lat: '16.8214',
+                lng: '100.2655',
+                desc: 'ระดับน้ำสูงประมาณ 30 ซม. น้ำเอ่อล้นตลิ่ง รอการสูบน้ำ',
+                badge: 'วิกฤต/รอสูบน้ำ',
+                badgeClass: 'danger',
+                time: '15 นาทีที่แล้ว',
+                image: ''
+            },
+            {
+                id: 'PLK-FLD-050',
+                type: 'น้ำท่วมขังผิวจราจร (รถเล็กสัญจรลำบาก)',
+                loc: 'ถนนสิงหวัฒน์ (หน้าห้างดัง)',
+                lat: '16.8252',
+                lng: '100.2618',
+                desc: 'น้ำท่วมขังรอการระบาย รถเล็กควรโปรดระมัดระวัง',
+                badge: 'เฝ้าระวัง',
+                badgeClass: 'warning',
+                time: '1 ชั่วโมงที่แล้ว',
+                image: ''
+            }
+        ];
+
+        let currentRiskPoints = [
+            { name: 'จุดเสี่ยงที่ 1: ชุมชนป่ามะม่วง (ลุ่มต่ำริมแม่น้ำ)', lat: '16.8214', lng: '100.2655', status: 'เฝ้าระวังสูงสุด' },
+            { name: 'จุดเสี่ยงที่ 2: ชุมชนท่ามา้า (ทางน้ำหลาก)', lat: '16.8182', lng: '100.2590', status: 'เฝ้าระวังปานกลาง' },
+            { name: 'จุดเสี่ยงที่ 3: ถนนสิงหวัฒน์ ช่วงหน้าห้างสรรพสินค้า', lat: '16.8252', lng: '100.2618', status: 'เฝ้าระวังน้ำขังรอระบาย' }
+        ];
+
+        let activePumps = [
+            { name: 'เครื่องสูบน้ำแรงสูงจุดที่ 1 (สะพานนเรศวร ฝั่งตะวันตก)', lat: '16.8231', lng: '100.2610', cap: 'ขนาด 14 นิ้ว (29,000 ลิตร/นาที)' },
+            { name: 'เครื่องสูบน้ำแรงสูงจุดที่ 2 (หน้าวัดใหญ่ วัดพระศรีรัตนมหาธาตุฯ)', lat: '16.8245', lng: '100.2635', cap: 'ขนาด 14 นิ้ว (29,000 ลิตร/นาที)' },
+            { name: 'เครื่องสูบน้ำจุดที่ 3 (ชุมชน 4 แคว)', lat: '16.8190', lng: '100.2570', cap: 'ขนาด 8 นิ้ว (ระบบสำรอง)' },
+            { name: 'เครื่องสูบน้ำจุดที่ 4 (คลองคูเมือง หน้าสถานีอนามัยเก่า)', lat: '16.8270', lng: '100.2600', cap: 'ขนาด 8 นิ้ว (ระบายน้ำถนนเอกาทศรถ)' }
+        ];
+
+        let waterStations = [
+            { name: 'สถานีวัดน้ำ N.5A (สะพานเอกาทศรถ อ.เมืองพิษณุโลก)', lat: '16.8197', lng: '100.2631', level: '10.54 ม. (ระดับปกติปลอดภัย)' }
+        ];
+
+        let zoneRatios = [
+            { zone: 'โซนเศรษฐกิจชั้นใน (เทศบาลนครพิษณุโลก)', percent: '45%', desc: 'ไม่มีน้ำท่วมขัง ควบคุมด้วยคันกั้นน้ำและเครื่องสูบน้ำ' },
+            { zone: 'โซนชุมชนลุ่มต่ำนอกคันกั้นน้ำ (ป่ามะม่วง/ท่ามะ้า)', percent: '35%', desc: 'น้ำเอ่อล้นตลิ่งตามฤดูกาล เฝ้าระวังใกล้ชิด' },
+            { zone: 'โซนผิวจราจรและจุดรอการระบาย (ถนนสิงหวัฒน์/เอกาทศรถ)', percent: '20%', desc: 'มีน้ำขังช่วงฝนตกหนักและระบายออกทันที' }
+        ];
+
+        let incidents = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultIncidents;
+
+        function saveToStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(incidents));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateRealtimeClock();
+            renderAllViews();
+        });
+
+        function renderAllViews() {
+            renderHomeList();
+            renderStatusList();
+            renderMapList();
+            renderAnalyticsViews();
+        }
+
+        function renderAnalyticsViews() {
+            const riskContainer = document.getElementById('analytics-risk-list');
+            if (riskContainer) {
+                riskContainer.innerHTML = '';
+                currentRiskPoints.forEach((risk) => {
+                    riskContainer.innerHTML += `
+                        <div class="incident-card" style="border-left: 4px solid var(--danger);">
+                            <div class="incident-header">
+                                <span class="incident-title">${risk.name}</span>
+                                <span class="status-badge danger">${risk.status}</span>
+                            </div>
+                            <div class="incident-loc"><i class="fa-solid fa-location-dot"></i> พิกัด: ${risk.lat}, ${risk.lng}</div>
+                            <div class="incident-footer">
+                                <span>อัปเดตล่าสุด: วันนี้</span>
+                                <span style="color: var(--primary); font-weight: 600; cursor: pointer;" onclick="openGoogleMap('${risk.lat}', '${risk.lng}', '${risk.name}')">
+                                    <i class="fa-solid fa-map-location-dot"></i> เปิด Google Maps
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            const pumpContainer = document.getElementById('analytics-pumps-list');
+            if (pumpContainer) {
+                pumpContainer.innerHTML = '';
+                activePumps.forEach((pump) => {
+                    pumpContainer.innerHTML += `
+                        <div class="incident-card" style="border-left: 4px solid var(--success);">
+                            <div class="incident-header">
+                                <span class="incident-title">⚙️ ${pump.name}</span>
+                                <span class="status-badge success">กำลังทำงาน</span>
+                            </div>
+                            <div class="incident-loc">กำลังสูบ: ${pump.cap}</div>
+                            <div style="font-size: 0.68rem; color: var(--primary); font-weight: 600; margin-bottom: 6px;">
+                                พิกัด: ${pump.lat}, ${pump.lng}
+                            </div>
+                            <div class="incident-footer">
+                                <span>สถานะ: ทำงานปกติ 100%</span>
+                                <span style="color: var(--primary); font-weight: 600; cursor: pointer;" onclick="openGoogleMap('${pump.lat}', '${pump.lng}', '${pump.name}')">
+                                    <i class="fa-solid fa-map-location-dot"></i> เปิดพิกัดนี้บน Maps
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            const waterContainer = document.getElementById('analytics-water-stations');
+            if (waterContainer) {
+                waterContainer.innerHTML = '';
+                waterStations.forEach((ws) => {
+                    waterContainer.innerHTML += `
+                        <div class="incident-card" style="border-left: 4px solid var(--primary);">
+                            <div class="incident-header">
+                                <span class="incident-title"><i class="fa-solid fa-water"></i> ${ws.name}</span>
+                                <span class="status-badge success">ปลอดภัย</span>
+                            </div>
+                            <div class="incident-loc">ระดับน้ำปัจจุบัน: ${ws.level}</div>
+                            <div class="incident-footer">
+                                <span>พิกัด: ${ws.lat}, ${ws.lng}</span>
+                                <span style="color: var(--primary); font-weight: 600; cursor: pointer;" onclick="openGoogleMap('${ws.lat}', '${ws.lng}', '${ws.name}')">
+                                    <i class="fa-solid fa-map-location-dot"></i> เปิด Google Maps
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            const ratioContainer = document.getElementById('analytics-zone-ratio');
+            if (ratioContainer) {
+                ratioContainer.innerHTML = '';
+                zoneRatios.forEach((z) => {
+                    ratioContainer.innerHTML += `
+                        <div class="incident-card" style="border-left: 4px solid var(--warning);">
+                            <div class="incident-header">
+                                <span class="incident-title">${z.zone}</span>
+                                <span class="status-badge warning">${z.percent} ของพื้นที่</span>
+                            </div>
+                            <div class="incident-loc"><i class="fa-solid fa-circle-info"></i> ${z.desc}</div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
         function switchScreen(screenId) {
             document.querySelectorAll('.screen-view').forEach(screen => {
                 screen.classList.remove('active');
@@ -809,15 +859,11 @@
                 'screen-status': 'nav-status',
                 'screen-analytics': 'nav-analytics'
             };
-            if(navMap[screenId]) {
-                updateNav(navMap[screenId]);
-            }
+            if(navMap[screenId]) updateNav(navMap[screenId]);
         }
 
         function updateNav(navId) {
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             const target = document.getElementById(navId);
             if(target) target.classList.add('active');
         }
@@ -826,39 +872,248 @@
             const toast = document.getElementById('toast');
             toast.innerText = message;
             toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 2500);
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        let uploadedImageBase64 = '';
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImageBase64 = e.target.result;
+                    document.getElementById('imagePreviewContainer').innerHTML = `<img src="${uploadedImageBase64}" class="preview-thumb">`;
+                }
+                reader.readAsDataURL(file);
+                showToast('แนบรูปภาพสำเร็จ');
+            }
+        }
+
+        function openReportFormForAdd() {
+            document.getElementById('report-header-title').innerText = 'แจ้งจุดเสี่ยงน้ำท่วม';
+            document.getElementById('edit-index').value = '-1';
+            document.getElementById('report-type').selectedIndex = 0;
+            document.getElementById('report-loc').value = '';
+            document.getElementById('report-lat').value = '16.8200';
+            document.getElementById('report-lng').value = '100.2600';
+            document.getElementById('report-desc').value = '';
+            document.getElementById('imagePreviewContainer').innerHTML = '';
+            uploadedImageBase64 = '';
+            switchScreen('screen-report');
+        }
+
+        function openReportFormForEdit(index) {
+            const item = incidents[index];
+            document.getElementById('report-header-title').innerText = 'แก้ไขข้อมูลจุดเสี่ยง';
+            document.getElementById('edit-index').value = index;
+            document.getElementById('report-type').value = item.type;
+            document.getElementById('report-loc').value = item.loc;
+            document.getElementById('report-lat').value = item.lat || '16.8200';
+            document.getElementById('report-lng').value = item.lng || '100.2600';
+            document.getElementById('report-desc').value = item.desc;
+            
+            uploadedImageBase64 = item.image || '';
+            const container = document.getElementById('imagePreviewContainer');
+            container.innerHTML = uploadedImageBase64 ? `<img src="${uploadedImageBase64}" class="preview-thumb">` : '';
+
+            switchScreen('screen-report');
         }
 
         function submitReport() {
+            const editIndex = parseInt(document.getElementById('edit-index').value);
             const type = document.getElementById('report-type').value;
-            const loc = document.getElementById('report-loc').value;
-            
-            if(!loc) {
-                showToast('กรุณาระบุพิกัดหรือจุดเกิดเหตุ');
+            const loc = document.getElementById('report-loc').value.trim();
+            const lat = document.getElementById('report-lat').value.trim() || '16.8200';
+            const lng = document.getElementById('report-lng').value.trim() || '100.2600';
+            const desc = document.getElementById('report-desc').value.trim();
+
+            if (!loc) {
+                showToast('กรุณาระบุชื่อสถานที่หรือจุดเกิดเหตุ');
                 return;
             }
 
-            showToast('ส่งรายงานสถานการณ์น้ำท่วมเรียบร้อย!');
-            
-            const list = document.getElementById('home-incident-list');
-            const newCard = document.createElement('div');
-            newCard.className = 'incident-card';
-            newCard.setAttribute('onclick', "switchScreen('screen-detail')");
-            newCard.innerHTML = `
-                <div class="incident-header">
-                    <span class="incident-title">${type}</span>
-                    <span class="status-badge danger">วิกฤต/รอสูบน้ำ</span>
-                </div>
-                <div class="incident-loc"><i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> ${loc}</div>
-                <div class="incident-footer"><span>รหัส: #PLK-FLD-052</span><span>เมื่อสักครู่</span></div>
-            `;
-            list.prepend(newCard);
+            if (editIndex === -1) {
+                const newIncident = {
+                    id: 'PLK-FLD-' + Math.floor(100 + Math.random() * 900),
+                    type: type,
+                    loc: loc,
+                    lat: lat,
+                    lng: lng,
+                    desc: desc || 'ไม่มีรายละเอียดเพิ่มเติม',
+                    badge: 'รอดำเนินการ',
+                    badgeClass: 'danger',
+                    time: 'เมื่อสักครู่',
+                    image: uploadedImageBase64
+                };
+                incidents.unshift(newIncident);
+                currentRiskPoints.push({ name: loc, lat: lat, lng: lng, status: 'ผู้ใช้งานอัปเดตใหม่' });
+                showToast('บันทึกข้อมูลถาวรเรียบร้อย!');
+            } else {
+                incidents[editIndex].type = type;
+                incidents[editIndex].loc = loc;
+                incidents[editIndex].lat = lat;
+                incidents[editIndex].lng = lng;
+                incidents[editIndex].desc = desc;
+                incidents[editIndex].image = uploadedImageBase64;
+                showToast('อัปเดตข้อมูลเรียบร้อย!');
+            }
 
-            setTimeout(() => {
-                switchScreen('screen-status');
-            }, 1200);
+            saveToStorage();
+            renderAllViews();
+            switchScreen('screen-status');
+        }
+
+        function deleteIncident(index) {
+            if (confirm('คุณต้องการลบข้อมูลจุดเสี่ยงนี้ใช่หรือไม่?')) {
+                incidents.splice(index, 1);
+                saveToStorage();
+                renderAllViews();
+                showToast('ลบข้อมูลเรียบร้อย');
+            }
+        }
+
+        function openGoogleMap(lat, lng, locationName) {
+            showToast('กำลังเปิดพิกัด: ' + locationName);
+            const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+            setTimeout(() => { window.open(url, '_blank'); }, 400);
+        }
+
+        function renderHomeList() {
+            const container = document.getElementById('home-incident-list');
+            container.innerHTML = '';
+            
+            if (incidents.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.75rem; padding: 15px;">ยังไม่มีข้อมูลจุดเสี่ยง</div>`;
+                return;
+            }
+
+            incidents.slice(0, 3).forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'incident-card';
+                card.innerHTML = `
+                    <div class="incident-header" onclick="viewDetail(${index})">
+                        <span class="incident-title">${item.type}</span>
+                        <span class="status-badge ${item.badgeClass}">${item.badge}</span>
+                    </div>
+                    <div class="incident-loc" onclick="viewDetail(${index})">
+                        <i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> ${item.loc}
+                    </div>
+                    <div class="incident-footer" onclick="viewDetail(${index})">
+                        <span>รหัส: #${item.id}</span>
+                        <span>${item.time}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderStatusList() {
+            const container = document.getElementById('full-incident-list');
+            container.innerHTML = '';
+
+            if (incidents.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.75rem; padding: 20px;">ยังไม่มีรายการแจ้งเหตุในระบบ</div>`;
+                return;
+            }
+
+            incidents.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'incident-card';
+                card.innerHTML = `
+                    <div class="incident-header" onclick="viewDetail(${index})">
+                        <span class="incident-title">${item.type}</span>
+                        <span class="status-badge ${item.badgeClass}">${item.badge}</span>
+                    </div>
+                    <div class="incident-loc" onclick="viewDetail(${index})">
+                        <i class="fa-solid fa-location-dot"></i> ${item.loc}
+                    </div>
+                    <div style="font-size: 0.68rem; color: var(--primary); margin-bottom: 6px; cursor: pointer;" onclick="openGoogleMap('${item.lat}', '${item.lng}', '${item.loc}')">
+                        <i class="fa-solid fa-map"></i> พิกัด: ${item.lat}, ${item.lng} (คลิกเปิด Google Maps)
+                    </div>
+                    <div class="incident-footer">
+                        <span>รหัส: #${item.id}</span>
+                        <div style="display: flex; gap: 10px;">
+                            <span style="color: var(--primary); font-weight: 600; cursor: pointer;" onclick="openReportFormForEdit(${index})"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</span>
+                            <span style="color: var(--danger); font-weight: 600; cursor: pointer;" onclick="deleteIncident(${index})"><i class="fa-solid fa-trash"></i> ลบ</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderMapList() {
+            const container = document.getElementById('map-incident-list');
+            container.innerHTML = '';
+
+            if (incidents.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.75rem; padding: 15px;">ไม่มีพิกัดในระบบ</div>`;
+                return;
+            }
+
+            incidents.forEach((item) => {
+                const card = document.createElement('div');
+                card.className = 'incident-card';
+                card.style.borderLeft = '4px solid var(--primary)';
+                card.onclick = () => openGoogleMap(item.lat, item.lng, item.loc);
+                card.innerHTML = `
+                    <div class="incident-header">
+                        <span class="incident-title"><i class="fa-solid fa-water" style="color: var(--primary);"></i> ${item.loc}</span>
+                        <span class="status-badge ${item.badgeClass}">${item.badge}</span>
+                    </div>
+                    <div class="incident-loc">ประเภท: ${item.type}</div>
+                    <div style="font-size: 0.68rem; color: var(--primary); font-weight: 600;">พิกัด: ${item.lat}, ${item.lng} (คลิกนำทางด้วย Google Maps)</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function viewDetail(index) {
+            const item = incidents[index];
+            const container = document.getElementById('detail-content-box');
+            
+            let imgHTML = `<div style="background: #cbd5e1; height: 130px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 0.75rem; font-weight: 600;">ไม่มีรูปภาพประกอบ</div>`;
+            if (item.image) {
+                imgHTML = `<img src="${item.image}" style="width: 100%; height: 140px; border-radius: 10px; object-fit: cover; margin-bottom: 10px; border: 1px solid var(--border);">`;
+            }
+
+            container.innerHTML = `
+                ${imgHTML}
+                <div style="font-size: 0.85rem; font-weight: 700; margin-bottom: 4px;">${item.type}</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 6px;"><i class="fa-solid fa-location-dot"></i> ${item.loc}</div>
+                <div style="font-size: 0.72rem; color: var(--primary); font-weight: 600; margin-bottom: 8px; cursor: pointer;" onclick="openGoogleMap('${item.lat}', '${item.lng}', '${item.loc}')">
+                    <i class="fa-solid fa-map-location-dot"></i> พิกัด: ${item.lat}, ${item.lng} (คลิกเปิด Google Maps)
+                </div>
+                <div style="font-size: 0.72rem; background: var(--card-bg); padding: 10px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 14px;">
+                    <strong>รายละเอียด:</strong> ${item.desc}
+                </div>
+
+                <div class="section-header">
+                    <span class="section-title">เบอร์โทรติดต่อหน่วยงานช่วยเหลือในพื้นที่</span>
+                </div>
+
+                <a href="tel:055252525" style="text-decoration: none;">
+                    <div class="incident-card" style="border-left: 4px solid var(--primary); display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; margin-bottom: 8px;">
+                        <div>
+                            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-dark);">ปภ. จังหวัดพิษณุโลก</div>
+                            <div style="font-size: 0.68rem; color: var(--primary); font-weight: 600;"><i class="fa-solid fa-phone"></i> 055-252-525</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 0.8rem;"></i>
+                    </div>
+                </a>
+
+                <a href="tel:055282218" style="text-decoration: none;">
+                    <div class="incident-card" style="border-left: 4px solid var(--success); display: flex; align-items: justify; justify-content: space-between; padding: 10px 12px; margin-bottom: 8px;">
+                        <div>
+                            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-dark);">เทศบาลนครพิษณุโลก</div>
+                            <div style="font-size: 0.68rem; color: var(--success); font-weight: 600;"><i class="fa-solid fa-phone"></i> 055-282-218</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 0.8rem;"></i>
+                    </div>
+                </a>
+            `;
+
+            switchScreen('screen-detail');
         }
     </script>
 </body>
