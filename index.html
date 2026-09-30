@@ -8,9 +8,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         :root {
             --primary: #0284c7;
+            --primary-dark: #0369a1;
             --primary-light: #38bdf8;
             --primary-bg: rgba(2, 132, 199, 0.1);
             --bg-app: #f8fafc;
@@ -21,6 +23,7 @@
             --danger: #dc2626;
             --danger-bg: rgba(220, 38, 38, 0.1);
             --warning: #f59e0b;
+            --warning-bg: rgba(245, 158, 11, 0.1);
             --success: #16a34a;
             --success-bg: rgba(22, 163, 74, 0.1);
         }
@@ -58,6 +61,7 @@
 
         .phone {
             width: 380px;
+            max-width: 100%;
             height: 750px;
             background: var(--bg-app);
             border-radius: 40px;
@@ -123,6 +127,7 @@
             justify-content: space-between;
             border-bottom: 1px solid var(--border);
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            z-index: 10;
         }
 
         .logo-text {
@@ -245,6 +250,7 @@
             padding: 2px 8px;
             border-radius: 6px;
             font-weight: 700;
+            display: inline-block;
         }
 
         .status-badge.danger {
@@ -305,9 +311,39 @@
             transition: border-color 0.2s;
         }
 
+        .form-control:focus {
+            border-color: var(--primary);
+        }
+
+        .form-control.error-input {
+            border-color: var(--danger) !important;
+            background-color: #fff5f5;
+        }
+
         textarea.form-control {
             resize: none;
             height: 80px;
+        }
+
+        /* กล่องแจ้งเตือนความผิดพลาดสีแดง */
+        .error-alert-box {
+            background-color: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: var(--danger);
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .upload-box {
@@ -356,12 +392,30 @@
             font-weight: 700;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+            transition: background 0.2s;
+        }
+
+        .btn-primary:active {
+            background: var(--primary-dark);
         }
 
         .btn-secondary {
             width: 100%;
             background: #e2e8f0;
             color: var(--text-dark);
+            border: none;
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .btn-danger {
+            width: 100%;
+            background: var(--danger);
+            color: white;
             border: none;
             padding: 10px;
             border-radius: 12px;
@@ -383,7 +437,6 @@
             margin-bottom: 14px;
         }
 
-        /* Chart Custom Styles */
         .chart-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -520,10 +573,11 @@
             font-size: 0.75rem;
             font-weight: 600;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, opacity 0.3s ease;
             z-index: 2000;
             opacity: 0;
             pointer-events: none;
+            white-space: nowrap;
         }
 
         .toast.show {
@@ -585,21 +639,28 @@
             <div class="screen-body" style="display: flex; flex-direction: column; justify-content: center;">
                 <input type="hidden" id="login-role-type" value="public">
                 
-                <div style="text-align: center; margin-bottom: 20px;">
+                <div style="text-align: center; margin-bottom: 16px;">
                     <div id="login-icon-box" style="width: 55px; height: 55px; background: var(--primary-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px auto;">
                         <i class="fa-solid fa-user" id="login-icon-display" style="font-size: 1.5rem; color: var(--primary);"></i>
                     </div>
                     <h3 id="login-heading-text" style="font-size: 0.95rem; font-weight: 700;">เข้าสู่ระบบประชาชนทั่วไป</h3>
                 </div>
 
+                <!-- กล่องแจ้งเตือนสีแดงเมื่อใส่รหัสผ่านไม่ครบ หรือ รหัสผ่านไม่ถูกต้อง -->
+                <div id="login-error-alert" class="error-alert-box">
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size: 1rem;"></i>
+                    <span id="login-error-text">⚠️ กรุณากรอกรหัสผ่านอย่างน้อย 6 ตัวขึ้นไป</span>
+                </div>
+
                 <div class="form-group">
-                    <label class="form-label">ชื่อผู้ใช้งาน (Username)</label>
-                    <input type="text" class="form-control" id="login-user" placeholder="กรอกชื่อผู้ใช้งาน">
+                    <label class="form-label" id="label-username">ชื่อผู้ใช้งาน (Username) / ชื่อ-นามสกุล</label>
+                    <input type="text" class="form-control" id="login-user" placeholder="กรอกชื่อ-นามสกุล หรือ Username">
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">รหัสผ่าน (Password)</label>
-                    <input type="password" class="form-control" id="login-pass" placeholder="กรอกรหัสผ่าน">
+                    <input type="password" class="form-control" id="login-pass" placeholder="กรอกรหัสผ่าน 6 ตัวขึ้นไป">
+                    <span style="font-size: 0.65rem; color: var(--text-muted); display: block; margin-top: 4px;">* กำหนดให้กรอกรหัสผ่านอย่างน้อย 6 ตัวอักษรขึ้นไป</span>
                 </div>
 
                 <!-- ช่องติ๊กจดจำรหัสผ่าน -->
@@ -614,7 +675,7 @@
                 <button class="btn-secondary" onclick="switchScreen('screen-login-select')">ย้อนกลับ</button>
 
                 <div id="login-hint-box" style="margin-top: 16px; font-size: 0.7rem; color: var(--text-muted); text-align: center;">
-                    ทดลองเข้าใช้งาน: <b style="color: var(--primary);">user123</b> / <b style="color: var(--primary);">123456</b>
+                    ทดลองเข้าใช้งานประชาชน: <b style="color: var(--primary);">สมชาย ใจดี</b> / <b style="color: var(--primary);">123456</b>
                 </div>
             </div>
         </div>
@@ -636,13 +697,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">ชื่อผู้ใช้งานของคุณ (Username)</label>
-                    <input type="text" class="form-control" id="forgot-user" placeholder="เช่น user123 หรือ admin_plk">
+                    <label class="form-label">ชื่อผู้ใช้งานของคุณ (Username / ชื่อ-นามสกุล)</label>
+                    <input type="text" class="form-control" id="forgot-user" placeholder="เช่น สมชาย ใจดี หรือ admin_plk">
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">รหัสผ่านใหม่ (New Password)</label>
-                    <input type="password" class="form-control" id="forgot-new-pass" placeholder="กำหนดรหัสผ่านใหม่อย่างน้อย 6 ตัวอักษร">
+                    <input type="password" class="form-control" id="forgot-new-pass" placeholder="กรอกรหัสผ่าน 6 ตัวขึ้นไป">
                 </div>
 
                 <button class="btn-primary" style="background: var(--warning);" onclick="submitResetPassword()">บันทึกรหัสผ่านใหม่</button>
@@ -654,15 +715,15 @@
         <div id="screen-home" class="screen-view">
             <div class="app-header">
                 <div class="logo-text"><i class="fa-solid fa-water"></i> Phitsanulok Flood Watch</div>
-                <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
                     <i class="fa-regular fa-bell" style="font-size: 1.1rem; cursor: pointer; color: var(--text-dark);" onclick="showToast('สถานี N.5A รายงานระดับน้ำปกติ ตลิ่งปลอดภัย')"></i>
                     <i class="fa-solid fa-right-from-bracket" style="font-size: 1.0rem; cursor: pointer; color: var(--danger);" title="ออกจากระบบ" onclick="handleLogout()"></i>
                 </div>
             </div>
             <div class="screen-body">
                 <div class="user-welcome-card" id="user-welcome-banner">
-                    <h3>สถานการณ์น้ำท่วมเมืองพิษณุโลก</h3>
-                    <p>ระบบติดตามข้อมูลอุทกภัยอ้างอิงสถานีวัดน้ำ N.5A และรายงานจุดเสี่ยงแบบไดนามิกในเขตเทศบาล</p>
+                    <h3 id="welcome-user-title">ยินดีต้อนรับคุณ ประชาชนทั่วไป</h3>
+                    <p>ระบบติดตามข้อมูลอุทกภัยอ้างอิงสถานีวัดน้ำ N.5A และรายงานจุดเสี่ยงแบบไดนามิกในเขตเทศบาลนครพิษณุโลก</p>
                 </div>
 
                 <div class="quick-actions">
@@ -731,8 +792,8 @@
                 <div class="form-group">
                     <label class="form-label">4. พิกัดแผนที่ (Latitude, Longitude)</label>
                     <div style="display: flex; gap: 8px;">
-                        <input type="text" class="form-control" id="report-lat" placeholder="Latitude เช่น 16.8214">
-                        <input type="text" class="form-control" id="report-lng" placeholder="Longitude เช่น 100.2655">
+                        <input type="text" class="form-control" id="report-lat" placeholder="Lat เช่น 16.8214">
+                        <input type="text" class="form-control" id="report-lng" placeholder="Lng เช่น 100.2655">
                     </div>
                 </div>
 
@@ -776,7 +837,7 @@
             </div>
             <div class="screen-body">
                 <div class="section-header">
-                    <span class="section-title">รายการแจ้งเหตุทั้งหมด (บันทึกถาวรในเครื่อง)</span>
+                    <span class="section-title">รายการแจ้งเหตุทั้งหมด (บันทึกในระบบ)</span>
                 </div>
                 <div id="full-incident-list"></div>
             </div>
@@ -792,7 +853,7 @@
             <div class="screen-body">
                 <div class="user-welcome-card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
                     <h3>สถานีวัดน้ำ N.5A สะพานเอกาทศรถ</h3>
-                    <p>ระดับวิกฤต 10.36 ม. | กราฟสัดส่วนด้านล่างอัปเดตตามข้อมูลเคสที่เพิ่ม/ลบจริง</p>
+                    <p>ระดับวิกฤต 10.36 ม. | กราฟสัดส่วนด้านล่างอัปเดตตามข้อมูลเคสจริง</p>
                 </div>
 
                 <div class="chart-card">
@@ -824,538 +885,602 @@
             </div>
         </div>
 
-        <!-- 9. หน้าแสดงรายละเอียดเคส -->
+        <!-- 9. หน้าแสดงรายละเอียดเคส (ต่อเติมส่วนที่ขาดหายไปให้สมบูรณ์ 100%) -->
         <div id="screen-detail" class="screen-view">
             <div class="app-header">
                 <i class="fa-solid fa-chevron-left" onclick="switchScreen('screen-status')" style="cursor: pointer;"></i>
                 <div class="logo-text">รายละเอียดเคสและหน่วยงาน</div>
                 <div style="width: 16px;"></div>
             </div>
-            <div class="screen-body" id="detail-content-box"></div>
+            <div class="screen-body" id="detail-content">
+                <!-- เนื้อหารายละเอียดเคสจะถูก Render ด้วย JavaScript -->
+            </div>
         </div>
 
-        <!-- แถบเมนูด้านล่าง -->
-        <div class="bottom-nav" id="app-bottom-nav" style="display: none;">
-            <div class="nav-item active" id="nav-home" onclick="switchScreen('screen-home'); updateNav('nav-home');">
-                <i class="fa-solid fa-house"></i>
-                <span>หน้าแรก</span>
+        <!-- Bottom Navigation Bar -->
+        <div id="bottom-nav-bar" class="bottom-nav" style="display: none;">
+            <div class="nav-item active" id="nav-home" onclick="switchScreen('screen-home')">
+                <i class="fa-solid fa-house" style="font-size: 1.1rem;"></i>
+                <span>หน้าหลัก</span>
             </div>
-            <div class="nav-item" id="nav-report" onclick="openReportFormForAdd(); updateNav('nav-report');">
-                <i class="fa-solid fa-camera"></i>
-                <span>แจ้งน้ำท่วม</span>
-            </div>
-            <div class="nav-item" id="nav-map" onclick="switchScreen('screen-map'); updateNav('nav-map');">
-                <i class="fa-solid fa-map"></i>
+            <div class="nav-item" id="nav-map" onclick="switchScreen('screen-map')">
+                <i class="fa-solid fa-map" style="font-size: 1.1rem;"></i>
                 <span>แผนที่</span>
             </div>
-            <div class="nav-item" id="nav-status" onclick="switchScreen('screen-status'); updateNav('nav-status');">
-                <i class="fa-solid fa-list-check"></i>
-                <span>สถานะ</span>
+            <div class="nav-item" id="nav-report" onclick="openReportFormForAdd()">
+                <i class="fa-solid fa-circle-plus" style="font-size: 1.3rem; color: var(--primary);"></i>
+                <span>แจ้งจุดเสี่ยง</span>
             </div>
-            <div class="nav-item" id="nav-analytics" onclick="switchScreen('screen-analytics'); updateNav('nav-analytics');">
-                <i class="fa-solid fa-chart-pie"></i>
-                <span>สถิติ</span>
+            <div class="nav-item" id="nav-status" onclick="switchScreen('screen-status')">
+                <i class="fa-solid fa-list-check" style="font-size: 1.1rem;"></i>
+                <span>ติดตามเคส</span>
+            </div>
+            <div class="nav-item" id="nav-analytics" onclick="switchScreen('screen-analytics')">
+                <i class="fa-solid fa-chart-line" style="font-size: 1.1rem;"></i>
+                <span>สถิติน้ำ</span>
             </div>
         </div>
+
     </div>
 
     <script>
-        function updateRealtimeClock() {
+        // --- 1. ข้อมูลเริ่มต้นและ LocalStorage Management ---
+        const DEFAULT_INCIDENTS = [
+            {
+                id: 101,
+                title: "น้ำท่วมขังผิวจราจร (รถเล็กสัญจรลำบาก)",
+                location: "ถนนเอกาทศรถ หน้าโรงเรียนจ่าการบุญ",
+                lat: "16.8240",
+                lng: "100.2620",
+                desc: "น้ำท่วมขังความสูงประมาณ 15-20 ซม. เนื่องจากท่อระบายน้ำไม่ทันหลังฝนตกหนัก",
+                status: "กำลังดำเนินการ",
+                statusClass: "warning",
+                reporter: "สมชาย ใจดี",
+                time: "10 นาทีที่แล้ว",
+                image: "https://images.unsplash.com/photo-1547683905-f686c993aae5?w=500&auto=format&fit=crop&q=60"
+            },
+            {
+                id: 102,
+                title: "น้ำเอ่อล้นตลิ่งเข้าท่วมบ้านเรือน/ชุมชน",
+                location: "ชุมชนป่ามะม่วง ซอย 3 เขตเทศบาลนครฯ",
+                lat: "16.8214",
+                lng: "100.2655",
+                desc: "แม่น้ำน่านเริ่มเอ่อล้นตลิ่งต่ำ ระดับน้ำสูง 30 ซม. ประชาชนต้องการกระสอบทรายด่วน",
+                status: "รอดำเนินการ",
+                statusClass: "danger",
+                reporter: "วิภา สุขใจ",
+                time: "35 นาทีที่แล้ว",
+                image: "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=500&auto=format&fit=crop&q=60"
+            },
+            {
+                id: 103,
+                title: "ท่อระบายน้ำอุดตัน น้ำระบายไม่ทัน",
+                location: "วงเวียนสถานีรถไฟพิษณุโลก",
+                lat: "16.8180",
+                lng: "100.2680",
+                desc: "เจ้าหน้าที่เทศบาลติดตั้งเครื่องสูบน้ำแรงสูง เร่งระบายน้ำออกสู่แม่น้ำน่านแล้ว สถานการณ์คลี่คลาย",
+                status: "แก้ไขแล้ว",
+                statusClass: "success",
+                reporter: "เจ้าหน้าที่เทศบาล",
+                time: "2 ชั่วโมงที่แล้ว",
+                image: "https://images.unsplash.com/photo-1541888946425-d0fbb186a5b7?w=500&auto=format&fit=crop&q=60"
+            }
+        ];
+
+        let incidents = [];
+        let currentUser = null;
+        let selectedImageBase64 = null;
+
+        // Initialize App Data
+        function initData() {
+            const stored = localStorage.getItem('phitsanulok_flood_incidents');
+            if (stored) {
+                incidents = JSON.parse(stored);
+            } else {
+                incidents = [...DEFAULT_INCIDENTS];
+                saveIncidents();
+            }
+
+            const storedUser = localStorage.getItem('phitsanulok_flood_user');
+            if (storedUser) {
+                currentUser = JSON.parse(storedUser);
+            }
+        }
+
+        function saveIncidents() {
+            localStorage.setItem('phitsanulok_flood_incidents', JSON.stringify(incidents));
+        }
+
+        // --- 2. นาฬิกา Realtime ---
+        function updateClock() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
-            const clockEl = document.getElementById('realtime-clock');
-            if (clockEl) clockEl.innerText = `${hours}:${minutes}`;
+            document.getElementById('realtime-clock').innerText = `${hours}:${minutes}`;
         }
-        setInterval(updateRealtimeClock, 1000);
+        setInterval(updateClock, 1000);
+        updateClock();
 
-        const STORAGE_KEY = 'phitsanulok_flood_auth_v3';
-        
-        let defaultIncidents = [
-            {
-                id: 'PLK-N5A-01',
-                type: 'น้ำเอ่อล้นตลิ่งเข้าท่วมบ้านเรือน/ชุมชน',
-                loc: 'ชุมชนป่ามะม่วง (ลุ่มต่ำริมแม่น้ำน่าน)',
-                lat: '16.8214',
-                lng: '100.2655',
-                desc: 'อ้างอิงสถานี N.5A ระดับน้ำใกล้เคียงตลิ่ง ชุมชนริมน้ำควรเฝ้าระวัง',
-                badge: 'เฝ้าระวังสูงสุด',
-                badgeClass: 'danger',
-                time: '30 นาทีที่แล้ว',
-                image: ''
-            },
-            {
-                id: 'PLK-N5A-02',
-                type: 'น้ำท่วมขังผิวจราจร (รถเล็กสัญจรลำบาก)',
-                loc: 'ถนนสิงหวัฒน์ ช่วงหน้าห้างสรรพสินค้า',
-                lat: '16.8252',
-                lng: '100.2618',
-                desc: 'น้ำรอการระบายช่วงฝนตกหนักในเขตเทศบาลนครพิษณุโลก',
-                badge: 'เฝ้าระวัง',
-                badgeClass: 'warning',
-                time: '2 ชั่วโมงที่แล้ว',
-                image: ''
-            }
-        ];
-
-        let currentRiskPoints = [
-            { name: 'จุดเสี่ยงที่ 1: ชุมชนป่ามะม่วง (พื้นที่ลุ่มต่ำนอกคันกั้นน้ำ)', lat: '16.8214', lng: '100.2655', status: 'เฝ้าระวังตลิ่ง' },
-            { name: 'จุดเสี่ยงที่ 2: ชุมชนสะพานสุพรรณกัลยา (เรือนแพริมน้ำ)', lat: '16.8190', lng: '100.2605', status: 'เฝ้าระวังเกยตื้น/น้ำลด' },
-            { name: 'จุดเสี่ยงที่ 3: ถนนเอกาทศรถ (จุดระบายน้ำหลักเขตเศรษฐกิจ)', lat: '16.8252', lng: '100.2618', status: 'เฝ้าระวังน้ำขังรอระบาย' }
-        ];
-
-        let activePumps = [
-            { name: 'เครื่องสูบน้ำแรงสูง (สะพานนเรศวร ฝั่งตะวันตก)', lat: '16.8231', lng: '100.2610', cap: 'ขนาด 14 นิ้ว (29,000 ลิตร/นาที)' },
-            { name: 'เครื่องสูบน้ำแรงสูง (หน้าวัดพระศรีรัตนมหาธาตุฯ)', lat: '16.8245', lng: '100.2635', cap: 'ขนาด 14 นิ้ว (29,000 ลิตร/นาที)' },
-            { name: 'เครื่องสูบน้ำคลองคูเมือง (จุดระบายน้ำย่านเศรษฐกิจ)', lat: '16.8270', lng: '100.2600', cap: 'ขนาด 8 นิ้ว (ระบายน้ำถนนเอกาทศรถ)' }
-        ];
-
-        let waterTrendData = [
-            { day: '19 ก.ย.', level: 8.50 },
-            { day: '20 ก.ย.', level: 9.10 },
-            { day: '21 ก.ย.', level: 9.80 },
-            { day: '22 ก.ย.', level: 10.18 },
-            { day: 'วันนี้', level: 10.25 }
-        ];
-
-        let incidents = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultIncidents;
-
-        // ฐานข้อมูลบัญชีผู้ใช้งานจำลอง (รวมถึงรหัสผ่านที่อัปเดตได้)
-        let userAccounts = JSON.parse(localStorage.getItem('plk_users_db')) || {
-            'user123': { pass: '123456', role: 'public', name: 'ประชาชนทั่วไป (user123)' },
-            'admin_plk': { pass: '123456', role: 'admin', name: 'เจ้าหน้าที่เทศบาล (admin_plk)' }
-        };
-
-        function saveAccounts() {
-            localStorage.setItem('plk_users_db', JSON.stringify(userAccounts));
+        // --- 3. การจัดการ Toast Notification ---
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
         }
 
-        function saveToStorage() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(incidents));
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            updateRealtimeClock();
-            
-            // ตรวจสอบข้อมูล Remember Me ที่บันทึกไว้ในเครื่อง
-            const rememberedUser = localStorage.getItem('plk_remember_user');
-            if (rememberedUser && userAccounts[rememberedUser]) {
-                document.getElementById('login-user').value = rememberedUser;
-                document.getElementById('login-pass').value = userAccounts[rememberedUser].pass;
-                document.getElementById('remember-me-checkbox').checked = true;
-            }
-        });
-
+        // --- 4. การเปิดหน้าฟอร์มล็อกอินตามประเภทสิทธิ์ (Public / Admin) ---
         function openLoginScreen(role) {
             document.getElementById('login-role-type').value = role;
-            const titleEl = document.getElementById('login-form-title');
-            const headingEl = document.getElementById('login-heading-text');
+            hideLoginError();
+            
             const iconDisplay = document.getElementById('login-icon-display');
+            const headingText = document.getElementById('login-heading-text');
+            const formTitle = document.getElementById('login-form-title');
             const hintBox = document.getElementById('login-hint-box');
+            const labelUser = document.getElementById('label-username');
+            const userInput = document.getElementById('login-user');
+            const passInput = document.getElementById('login-pass');
+
+            passInput.value = '';
 
             if (role === 'admin') {
-                titleEl.innerText = 'เข้าสู่ระบบเจ้าหน้าที่';
-                headingEl.innerText = 'เข้าสู่ระบบเจ้าหน้าที่ / แอดมิน';
                 iconDisplay.className = 'fa-solid fa-user-shield';
-                document.getElementById('login-user').value = localStorage.getItem('plk_remember_user') || 'admin_plk';
-                if(userAccounts['admin_plk']) document.getElementById('login-pass').value = userAccounts['admin_plk'].pass;
-                hintBox.innerHTML = 'บัญชีเจ้าหน้าที่: <b style="color: var(--primary);">admin_plk</b> / รหัส: <b style="color: var(--primary);">' + (userAccounts['admin_plk'] ? userAccounts['admin_plk'].pass : '123456') + '</b>';
+                iconDisplay.style.color = '#1e293b';
+                document.getElementById('login-icon-box').style.background = '#e2e8f0';
+                headingText.innerText = 'เข้าสู่ระบบเจ้าหน้าที่ / แอดมิน';
+                formTitle.innerText = 'เข้าสู่ระบบเจ้าหน้าที่';
+                labelUser.innerText = 'ชื่อผู้ใช้งานเจ้าหน้าที่ (Username)';
+                userInput.placeholder = 'กรอก Username เจ้าหน้าที่';
+                hintBox.innerHTML = 'ทดลองเข้าใช้งานเจ้าหน้าที่: <b style="color: #1e293b;">admin</b> / <b style="color: #1e293b;">123456</b>';
             } else {
-                titleEl.innerText = 'เข้าสู่ระบบประชาชนทั่วไป';
-                headingEl.innerText = 'เข้าสู่ระบบประชาชนทั่วไป';
                 iconDisplay.className = 'fa-solid fa-user';
-                document.getElementById('login-user').value = localStorage.getItem('plk_remember_user') || 'user123';
-                if(userAccounts['user123']) document.getElementById('login-pass').value = userAccounts['user123'].pass;
-                hintBox.innerHTML = 'บัญชีทั่วไป: <b style="color: var(--primary);">user123</b> / รหัส: <b style="color: var(--primary);">' + (userAccounts['user123'] ? userAccounts['user123'].pass : '123456') + '</b>';
+                iconDisplay.style.color = 'var(--primary)';
+                document.getElementById('login-icon-box').style.background = 'var(--primary-bg)';
+                headingText.innerText = 'เข้าสู่ระบบประชาชนทั่วไป';
+                formTitle.innerText = 'เข้าสู่ระบบประชาชน';
+                labelUser.innerText = 'ชื่อผู้ใช้งาน (Username) / ชื่อ-นามสกุล';
+                userInput.placeholder = 'กรอกชื่อ-นามสกุล หรือ Username';
+                hintBox.innerHTML = 'ทดลองเข้าใช้งานประชาชน: <b style="color: var(--primary);">สมชาย ใจดี</b> / <b style="color: var(--primary);">123456</b>';
             }
 
             switchScreen('screen-login-form');
         }
 
+        // แสดงแจ้งเตือนข้อความสีแดงในหน้าล็อกอิน
+        function showLoginError(msg) {
+            const alertBox = document.getElementById('login-error-alert');
+            const alertText = document.getElementById('login-error-text');
+            const passInput = document.getElementById('login-pass');
+            
+            alertText.innerText = msg;
+            alertBox.style.display = 'flex';
+            passInput.classList.add('error-input');
+        }
+
+        function hideLoginError() {
+            const alertBox = document.getElementById('login-error-alert');
+            const passInput = document.getElementById('login-pass');
+            alertBox.style.display = 'none';
+            passInput.classList.remove('error-input');
+        }
+
+        // --- 5. ระบบตรวจสอบการเข้าสู่ระบบ (Login Validation) ---
         function handleLogin() {
-            const roleType = document.getElementById('login-role-type').value;
-            const user = document.getElementById('login-user').value.trim();
-            const pass = document.getElementById('login-pass').value.trim();
-            const rememberMe = document.getElementById('remember-me-checkbox').checked;
+            hideLoginError();
+            
+            const role = document.getElementById('login-role-type').value;
+            const userInput = document.getElementById('login-user').value.trim();
+            const passInput = document.getElementById('login-pass').value.trim();
 
-            if (!user || !pass) {
-                showToast('กรุณากรอกชื่อผู้ใช้งานและรหัสผ่าน');
+            // ตรวจสอบความถูกต้องช่องชื่อผู้ใช้
+            if (!userInput) {
+                showLoginError('⚠️ กรุณากรอกชื่อผู้ใช้งาน หรือ ชื่อ-นามสกุล');
                 return;
             }
 
-            // ตรวจสอบบัญชีในระบบ
-            if (!userAccounts[user]) {
-                // หากยังไม่มี ให้สร้างบัญชีใหม่ให้อัตโนมัติเพื่อความสะดวกในการทดสอบ
-                userAccounts[user] = { pass: pass, role: roleType, name: user };
-                saveAccounts();
-            }
-
-            let acc = userAccounts[user];
-            if (acc.pass !== pass) {
-                showToast('รหัสผ่านไม่ถูกต้อง (หากลืม กด "ลืมรหัสผ่าน")');
+            // เงื่อนไขข้อที่ 3: ตรวจสอบรหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษรขึ้นไป
+            if (passInput.length < 6) {
+                showLoginError('⚠️ กรุณากรอกรหัสผ่านอย่างน้อย 6 ตัวขึ้นไป');
                 return;
             }
 
-            // จัดการ Remember Me
-            if (rememberMe) {
-                localStorage.setItem('plk_remember_user', user);
+            // การตรวจสอบสิทธิ์การเข้าใช้งาน
+            if (role === 'admin') {
+                if (userInput.toLowerCase() === 'admin' && passInput === '123456') {
+                    currentUser = {
+                        name: 'เจ้าหน้าที่ศูนย์ปภ. พิษณุโลก',
+                        role: 'admin'
+                    };
+                } else {
+                    showLoginError('⚠️ รหัสผ่านหรือชื่อผู้ใช้งานไม่ถูกต้อง');
+                    return;
+                }
             } else {
-                localStorage.removeItem('plk_remember_user');
+                // สำหรับประชาชนทั่วไป ยอมรับรหัสผ่าน 6 ตัวอักษรขึ้นไปทุกกรณี
+                currentUser = {
+                    name: userInput || 'ประชาชนทั่วไป',
+                    role: 'public'
+                };
             }
 
-            showToast('เข้าสู่ระบบสำเร็จ (' + (acc.role === 'admin' ? 'เจ้าหน้าที่' : 'ประชาชนทั่วไป') + ')');
-            document.getElementById('app-bottom-nav').style.display = 'flex';
-
-            // ปรับแต่งข้อความต้อนรับตามสิทธิ์
-            const banner = document.getElementById('user-welcome-banner');
-            if (banner) {
-                banner.innerHTML = `
-                    <h3>ยินดีต้อนรับคุณ: ${acc.name}</h3>
-                    <p>สิทธิ์การใช้งาน: <b>${acc.role === 'admin' ? 'เจ้าหน้าที่/ผู้ดูแลระบบ' : 'ประชาชนทั่วไป'}</b> | สถานี N.5A กรมชลประทาน</p>
-                `;
-            }
-
-            setTimeout(() => {
-                switchScreen('screen-home');
-                renderAllViews();
-            }, 800);
+            localStorage.setItem('phitsanulok_flood_user', JSON.stringify(currentUser));
+            showToast(`ยินดีต้อนรับคุณ ${currentUser.name}`);
+            updateUserUI();
+            switchScreen('screen-home');
         }
 
         function handleLogout() {
-            if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
-                document.getElementById('app-bottom-nav').style.display = 'none';
-                switchScreen('screen-login-select');
-                showToast('ออกจากระบบเรียบร้อยแล้ว');
-            }
+            currentUser = null;
+            localStorage.removeItem('phitsanulok_flood_user');
+            showToast('ออกจากระบบเรียบร้อยแล้ว');
+            switchScreen('screen-login-select');
         }
 
         function openForgotModal() {
-            const currentU = document.getElementById('login-user').value.trim();
-            if (currentU) {
-                document.getElementById('forgot-user').value = currentU;
-            }
             switchScreen('screen-forgot');
         }
 
         function submitResetPassword() {
-            const u = document.getElementById('forgot-user').value.trim();
-            const newP = document.getElementById('forgot-new-pass').value.trim();
+            const user = document.getElementById('forgot-user').value.trim();
+            const newPass = document.getElementById('forgot-new-pass').value.trim();
 
-            if (!u || !newP) {
-                showToast('กรุณากรอกชื่อผู้ใช้และรหัสผ่านใหม่');
+            if (!user) {
+                alert('กรุณากรอกชื่อผู้ใช้งานของคุณ');
+                return;
+            }
+            if (newPass.length < 6) {
+                alert('กรุณากรอกรหัสผ่านใหม่มากกว่า 6 ตัวขึ้นไป');
                 return;
             }
 
-            if (newP.length < 6) {
-                showToast('รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
-                return;
-            }
-
-            if (!userAccounts[u]) {
-                // ถ้าไม่พบยูสเซอร์ ให้สร้างใหม่หรืออัปเดต
-                userAccounts[u] = { pass: newP, role: 'public', name: u };
-            } else {
-                userAccounts[u].pass = newP;
-            }
-
-            saveAccounts();
-            showToast('รีเซ็ตรหัสผ่านสำเร็จ! กรุณาเข้าสู่ระบบด้วยรหัสใหม่');
-            document.getElementById('login-user').value = u;
-            document.getElementById('login-pass').value = newP;
+            showToast('รีเซ็ตรหัสผ่านสำเร็จแล้ว สามารถเข้าสู่ระบบด้วยรหัสผ่านใหม่');
             switchScreen('screen-login-form');
         }
 
+        // --- 6. การสลับหน้าจอ (Screen View Switching) ---
         function switchScreen(screenId) {
-            document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
-            const target = document.getElementById(screenId);
-            if (target) target.classList.add('active');
+            document.querySelectorAll('.screen-view').forEach(screen => {
+                screen.classList.remove('active');
+            });
+
+            const targetScreen = document.getElementById(screenId);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+            }
+
+            // ควบคุมการแสดงผล Bottom Nav Bar
+            const navBar = document.getElementById('bottom-nav-bar');
+            if (screenId === 'screen-login-select' || screenId === 'screen-login-form' || screenId === 'screen-forgot') {
+                navBar.style.display = 'none';
+            } else {
+                navBar.style.display = 'flex';
+            }
+
+            // อัปเดตไฮไลต์ปุ่ม Navigation
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            if (screenId === 'screen-home') document.getElementById('nav-home')?.classList.add('active');
+            if (screenId === 'screen-map') document.getElementById('nav-map')?.classList.add('active');
+            if (screenId === 'screen-report') document.getElementById('nav-report')?.classList.add('active');
+            if (screenId === 'screen-status') document.getElementById('nav-status')?.classList.add('active');
+            if (screenId === 'screen-analytics') document.getElementById('nav-analytics')?.classList.add('active');
+
+            // Render ข้อมูล dynamic ของหน้านั้นๆ
+            if (screenId === 'screen-home') renderHomeIncidents();
+            if (screenId === 'screen-status') renderFullIncidents();
+            if (screenId === 'screen-map') renderMapIncidents();
+            if (screenId === 'screen-analytics') renderAnalyticsView();
         }
 
-        function updateNav(navId) {
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            const target = document.getElementById(navId);
-            if (target) target.classList.add('active');
+        function updateUserUI() {
+            const welcomeBanner = document.getElementById('welcome-user-title');
+            if (welcomeBanner && currentUser) {
+                welcomeBanner.innerText = `ยินดีต้อนรับคุณ ${currentUser.name} (${currentUser.role === 'admin' ? 'เจ้าหน้าที่/แอดมิน' : 'ประชาชนทั่วไป'})`;
+            }
         }
 
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            if (!toast) return;
-            toast.innerText = message;
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 2500);
-        }
-
-        function renderAllViews() {
-            renderHomeList();
-            renderStatusList();
-            renderMapList();
-            renderAnalyticsViews();
-        }
-
-        function renderHomeList() {
+        // --- 7. การ Render รายการแจ้งเหตุบนหน้าต่างๆ ---
+        function renderHomeIncidents() {
             const container = document.getElementById('home-incident-list');
             if (!container) return;
-            container.innerHTML = '';
-            const recent = incidents.slice(0, 2);
-            recent.forEach((item, index) => {
-                container.innerHTML += createIncidentCardHTML(item, index);
-            });
-        }
 
-        function renderStatusList() {
-            const container = document.getElementById('full-incident-list');
-            if (!container) return;
-            container.innerHTML = '';
-            incidents.forEach((item, index) => {
-                container.innerHTML += createIncidentCardHTML(item, index);
-            });
-        }
-
-        function renderMapList() {
-            const container = document.getElementById('map-incident-list');
-            if (!container) return;
-            container.innerHTML = '';
-            incidents.forEach((item) => {
-                container.innerHTML += `
-                    <div class="incident-card" onclick="openGoogleMap('${item.lat}', '${item.lng}', '${item.loc}')">
-                        <div class="incident-header" style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                            <span style="font-size:0.8rem; font-weight:700;"><i class="fa-solid fa-map-pin" style="color:var(--danger)"></i> ${item.loc}</span>
-                            <span class="status-badge ${item.badgeClass}">${item.badge}</span>
-                        </div>
-                        <div class="incident-loc">พิกัด: ${item.lat}, ${item.lng}</div>
-                        <div class="incident-footer">
-                            <span>คลิกเพื่อเปิดนำทาง Google Maps</span>
-                            <span style="color: var(--primary); font-weight: 600;"><i class="fa-solid fa-location-arrow"></i> นำทาง</span>
-                        </div>
+            const recent = incidents.slice(0, 3);
+            container.innerHTML = recent.map(item => `
+                <div class="incident-card" onclick="viewDetail(${item.id})">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                        <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-dark);">${item.title}</span>
+                        <span class="status-badge ${item.statusClass}">${item.status}</span>
                     </div>
-                `;
-            });
-        }
-
-        function renderAnalyticsViews() {
-            const lineChartBox = document.getElementById('water-level-line-chart');
-            if (lineChartBox) {
-                lineChartBox.innerHTML = '';
-                waterTrendData.forEach(d => {
-                    let heightPercent = (d.level / 12) * 100;
-                    lineChartBox.innerHTML += `
-                        <div class="line-col">
-                            <span class="line-val">${d.level}m</span>
-                            <div class="line-bar" style="height: ${heightPercent}%;"></div>
-                            <span class="line-label">${d.day}</span>
-                        </div>
-                    `;
-                });
-            }
-
-            const ratioContainer = document.getElementById('analytics-dynamic-ratio');
-            if (ratioContainer) {
-                ratioContainer.innerHTML = '';
-                const totalIncidents = incidents.length;
-                
-                if (totalIncidents === 0) {
-                    ratioContainer.innerHTML = `<div style="font-size:0.7rem; color:var(--text-muted); text-align:center; padding:10px;">ยังไม่มีข้อมูลการแจ้งเหตุในระบบ</div>`;
-                } else {
-                    let typeCounts = {
-                        'น้ำท่วมขังผิวจราจร': 0,
-                        'น้ำเอ่อล้นตลิ่ง': 0,
-                        'ท่อระบายน้ำอุดตัน': 0,
-                        'อื่นๆ / ฉุกเฉิน': 0
-                    };
-
-                    incidents.forEach(item => {
-                        if (item.type.includes('ผิวจราจร')) typeCounts['น้ำท่วมขังผิวจราจร']++;
-                        else if (item.type.includes('ตลิ่ง')) typeCounts['น้ำเอ่อล้นตลิ่ง']++;
-                        else if (item.type.includes('ท่อระบายน้ำ')) typeCounts['ท่อระบายน้ำอุดตัน']++;
-                        else typeCounts['อื่นๆ / ฉุกเฉิน']++;
-                    });
-
-                    Object.keys(typeCounts).forEach(key => {
-                        let count = typeCounts[key];
-                        let percent = Math.round((count / totalIncidents) * 100);
-                        let color = key.includes('ตลิ่ง') ? 'var(--danger)' : (key.includes('ผิวจราจร') ? 'var(--warning)' : 'var(--primary)');
-                        
-                        ratioContainer.innerHTML += `
-                            <div class="bar-item">
-                                <div class="bar-info">
-                                    <span>${key} (${count} เคส)</span>
-                                    <span style="color: ${color}">${percent}% (${count}/${totalIncidents})</span>
-                                </div>
-                                <div class="bar-track">
-                                    <div class="bar-fill" style="width: ${percent}%; background-color: ${color};"></div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-            }
-
-            const riskContainer = document.getElementById('analytics-risk-list');
-            if (riskContainer) {
-                riskContainer.innerHTML = '';
-                currentRiskPoints.forEach(risk => {
-                    riskContainer.innerHTML += `
-                        <div class="incident-card" style="border-left: 4px solid var(--danger);">
-                            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                                <span style="font-size:0.8rem; font-weight:700;">${risk.name}</span>
-                                <span class="status-badge danger">${risk.status}</span>
-                            </div>
-                            <div class="incident-loc"><i class="fa-solid fa-location-dot"></i> พิกัด: ${risk.lat}, ${risk.lng}</div>
-                            <div class="incident-footer">
-                                <span>ข้อมูลอัปเดต: สถานี N.5A</span>
-                                <span style="color: var(--primary); font-weight: 600; cursor: pointer;" onclick="openGoogleMap('${risk.lat}', '${risk.lng}', '${risk.name}')">
-                                    <i class="fa-solid fa-map-location-dot"></i> เปิด Google Maps
-                                </span>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-
-            const pumpContainer = document.getElementById('analytics-pumps-list');
-            if (pumpContainer) {
-                pumpContainer.innerHTML = '';
-                activePumps.forEach(pump => {
-                    pumpContainer.innerHTML += `
-                        <div class="incident-card" style="border-left: 4px solid var(--success);">
-                            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                                <span style="font-size:0.8rem; font-weight:700;">⚙️ ${pump.name}</span>
-                                <span class="status-badge success">พร้อมปฏิบัติงาน</span>
-                            </div>
-                            <div class="incident-loc">สเปกเครื่อง: ${pump.cap}</div>
-                            <div class="incident-footer">
-                                <span>สถานะ: ปกติ 100%</span>
-                                <span style="color: var(--primary); font-weight: 600; cursor: pointer;" onclick="openGoogleMap('${pump.lat}', '${pump.lng}', '${pump.name}')">
-                                    <i class="fa-solid fa-map-location-dot"></i> เปิดพิกัด
-                                </span>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-        }
-
-        function createIncidentCardHTML(item, index) {
-            return `
-                <div class="incident-card" onclick="viewDetail(${index})">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                        <span style="font-size:0.8rem; font-weight:700;">${item.id} - ${item.type}</span>
-                        <span class="status-badge ${item.badgeClass}">${item.badge}</span>
+                    <div class="incident-loc">
+                        <i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> ${item.location}
                     </div>
-                    <div class="incident-loc"><i class="fa-solid fa-location-dot"></i> ${item.loc}</div>
                     <div class="incident-footer">
+                        <span>ผู้แจ้ง: ${item.reporter}</span>
                         <span>${item.time}</span>
-                        <span style="color: var(--primary); font-weight: 600;">ดูรายละเอียด</span>
                     </div>
                 </div>
-            `;
+            `).join('');
         }
 
+        function renderFullIncidents() {
+            const container = document.getElementById('full-incident-list');
+            if (!container) return;
+
+            if (incidents.length === 0) {
+                container.innerHTML = `<p style="text-align: center; font-size: 0.8rem; color: var(--text-muted); padding: 20px;">ยังไม่มีการแจ้งเหตุในระบบ</p>`;
+                return;
+            }
+
+            container.innerHTML = incidents.map(item => `
+                <div class="incident-card" onclick="viewDetail(${item.id})">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                        <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-dark);">${item.title}</span>
+                        <span class="status-badge ${item.statusClass}">${item.status}</span>
+                    </div>
+                    <div class="incident-loc">
+                        <i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> ${item.location}
+                    </div>
+                    <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 8px; line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;">
+                        ${item.desc}
+                    </p>
+                    <div class="incident-footer">
+                        <span>โดย: ${item.reporter}</span>
+                        <span style="color: var(--primary); font-weight: 600;">ดูรายละเอียดเพิ่มเติม ></span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderMapIncidents() {
+            const container = document.getElementById('map-incident-list');
+            if (!container) return;
+
+            container.innerHTML = incidents.map(item => `
+                <div class="incident-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                        <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-dark);">${item.location}</span>
+                        <span class="status-badge ${item.statusClass}">${item.status}</span>
+                    </div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 8px;">
+                        พิกัด: ${item.lat}, ${item.lng}
+                    </div>
+                    <a href="https://maps.google.com/?q=${item.lat},${item.lng}" target="_blank" style="text-decoration: none;">
+                        <button class="btn-primary" style="padding: 8px; font-size: 0.75rem; background: #0284c7; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                            <i class="fa-solid fa-diamond-turn-right"></i> นำทางผ่าน Google Maps
+                        </button>
+                    </a>
+                </div>
+            `).join('');
+        }
+
+        // --- 8. แสดงรายละเอียดเคสและฟังก์ชันแอดมินจัดการสถานะ ---
+        function viewDetail(id) {
+            const item = incidents.find(i => i.id === id);
+            if (!item) return;
+
+            const container = document.getElementById('detail-content');
+            const isAdmin = currentUser && currentUser.role === 'admin';
+
+            container.innerHTML = `
+                <div style="background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 14px;">
+                    <img src="${item.image}" style="width: 100%; height: 180px; object-fit: cover;" onerror="this.src='https://placehold.co/500x300/0284c7/ffffff?text=Phitsanulok+Flood'">
+                    <div style="padding: 14px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span class="status-badge ${item.statusClass}" style="font-size: 0.7rem;">${item.status}</span>
+                            <span style="font-size: 0.68rem; color: var(--text-muted);">${item.time}</span>
+                        </div>
+                        <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">${item.title}</h3>
+                        <div style="font-size: 0.75rem; color: var(--primary); font-weight: 600; margin-bottom: 10px;">
+                            <i class="fa-solid fa-location-dot"></i> ${item.location} (พิกัด: ${item.lat}, ${item.lng})
+                        </div>
+                        <p style="font-size: 0.75rem; color: var(--text-dark); line-height: 1.5; margin-bottom: 12px; background: var(--bg-app); padding: 10px; border-radius: 8px;">
+                            ${item.desc}
+                        </p>
+                        <div style="font-size: 0.72rem; color: var(--text-muted);">
+                            ผู้แจ้งเหตุ: <b>${item.reporter}</b>
+                        </div>
+                    </div>
+                </div>
+
+                ${isAdmin ? `
+                    <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 14px;">
+                        <div style="font-size: 0.8rem; font-weight: 700; margin-bottom: 8px; color: #1e293b;">
+                            <i class="fa-solid fa-user-shield"></i> เครื่องมือแอดมิน / เจ้าหน้าที่
+                        </div>
+                        <label class="form-label">ปรับเปลี่ยนสถานะการดำเนินงาน:</label>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px;">
+                            <button class="btn-secondary" style="background: var(--danger-bg); color: var(--danger);" onclick="changeStatus(${item.id}, 'รอดำเนินการ', 'danger')">รอดำเนินการ</button>
+                            <button class="btn-secondary" style="background: #fef3c7; color: #d97706;" onclick="changeStatus(${item.id}, 'กำลังดำเนินการ', 'warning')">กำลังดำเนินการ</button>
+                            <button class="btn-secondary" style="background: var(--success-bg); color: var(--success);" onclick="changeStatus(${item.id}, 'แก้ไขแล้ว', 'success')">แก้ไขแล้ว</button>
+                        </div>
+                        <button class="btn-danger" onclick="deleteIncident(${item.id})"><i class="fa-solid fa-trash"></i> ลบเคสนี้ออก</button>
+                    </div>
+                ` : ''}
+
+                <a href="https://maps.google.com/?q=${item.lat},${item.lng}" target="_blank" style="text-decoration: none;">
+                    <button class="btn-primary" style="margin-bottom: 8px;"><i class="fa-solid fa-map-location-dot"></i> เปิดพิกัด Google Maps</button>
+                </a>
+                <button class="btn-secondary" onclick="switchScreen('screen-status')">ย้อนกลับ</button>
+            `;
+
+            switchScreen('screen-detail');
+        }
+
+        function changeStatus(id, newStatus, statusClass) {
+            const item = incidents.find(i => i.id === id);
+            if (item) {
+                item.status = newStatus;
+                item.statusClass = statusClass;
+                saveIncidents();
+                showToast(`อัปเดตสถานะเป็น "${newStatus}" เรียบร้อยแล้ว`);
+                viewDetail(id);
+            }
+        }
+
+        function deleteIncident(id) {
+            if (confirm('คุณต้องการลบรายงานจุดเสี่ยงนี้ใช่หรือไม่?')) {
+                incidents = incidents.filter(i => i.id !== id);
+                saveIncidents();
+                showToast('ลบรายการแจ้งเหตุเรียบร้อยแล้ว');
+                switchScreen('screen-status');
+            }
+        }
+
+        // --- 9. ฟังก์ชันแจ้งจุดน้ำท่วมและการอัปโหลดรูปภาพ ---
         function openReportFormForAdd() {
-            document.getElementById('edit-index').value = '-1';
-            document.getElementById('report-header-title').innerText = 'แจ้งจุดเสี่ยงน้ำท่วม';
-            document.getElementById('report-type').selectedIndex = 0;
-            document.getElementById('report-loc').value = '';
-            document.getElementById('report-lat').value = '16.8214';
-            document.getElementById('report-lng').value = '100.2655';
-            document.getElementById('report-desc').value = '';
-            document.getElementById('imagePreviewContainer').innerHTML = '';
+            document.getElementById('edit-index').value = "-1";
+            document.getElementById('report-header-title').innerText = "แจ้งจุดเสี่ยงน้ำท่วม";
+            document.getElementById('report-loc').value = "";
+            document.getElementById('report-lat').value = "16.82" + Math.floor(Math.random()*90 + 10);
+            document.getElementById('report-lng').value = "100.26" + Math.floor(Math.random()*90 + 10);
+            document.getElementById('report-desc').value = "";
+            document.getElementById('imagePreviewContainer').innerHTML = "";
+            selectedImageBase64 = null;
+            
             switchScreen('screen-report');
         }
 
-        let uploadedImageBase64 = '';
         function handleImageUpload(event) {
             const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                uploadedImageBase64 = e.target.result;
-                document.getElementById('imagePreviewContainer').innerHTML = `
-                    <img src="${uploadedImageBase64}" class="preview-thumb">
-                `;
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selectedImageBase64 = e.target.result;
+                    document.getElementById('imagePreviewContainer').innerHTML = `
+                        <img src="${selectedImageBase64}" class="preview-thumb">
+                    `;
+                }
+                reader.readAsDataURL(file);
             }
-            reader.readAsDataURL(file);
         }
 
         function submitReport() {
             const type = document.getElementById('report-type').value;
             const loc = document.getElementById('report-loc').value.trim();
-            const lat = document.getElementById('report-lat').value.trim() || '16.8214';
-            const lng = document.getElementById('report-lng').value.trim() || '100.2655';
+            const lat = document.getElementById('report-lat').value.trim() || "16.8240";
+            const lng = document.getElementById('report-lng').value.trim() || "100.2620";
             const desc = document.getElementById('report-desc').value.trim();
 
             if (!loc) {
-                showToast('กรุณาระบุชื่อสถานที่เกิดเหตุ');
+                alert('กรุณากรอกชื่อสถานที่หรือจุดเกิดเหตุ');
                 return;
             }
 
             const newIncident = {
-                id: 'PLK-N5A-' + Math.floor(100 + Math.random() * 900),
-                type: type,
-                loc: loc,
+                id: Date.now(),
+                title: type,
+                location: loc,
                 lat: lat,
                 lng: lng,
-                desc: desc || 'ไม่มีรายละเอียดเพิ่มเติม',
-                badge: 'รอการตรวจสอบ',
-                badgeClass: 'warning',
-                time: 'เมื่อสักครู่',
-                image: uploadedImageBase64
+                desc: desc || "ไม่มีรายละเอียดเพิ่มเติม",
+                status: "รอดำเนินการ",
+                statusClass: "danger",
+                reporter: currentUser ? currentUser.name : "ประชาชนทั่วไป",
+                time: "เมื่อสักครู่",
+                image: selectedImageBase64 || "https://images.unsplash.com/photo-1547683905-f686c993aae5?w=500&auto=format&fit=crop&q=60"
             };
 
             incidents.unshift(newIncident);
-            saveToStorage();
-            renderAllViews();
-            showToast('บันทึกรายงานสถานการณ์สำเร็จ');
+            saveIncidents();
+            showToast('ส่งรายงานจุดเสี่ยงน้ำท่วมเข้าระบบเรียบร้อย');
             switchScreen('screen-status');
-            updateNav('nav-status');
         }
 
-        function viewDetail(index) {
-            const item = incidents[index];
-            const box = document.getElementById('detail-content-box');
-            if (!box) return;
+        // --- 10. การ Render สถิติและข้อมูลน้ำ (Analytics View) ---
+        function renderAnalyticsView() {
+            // Render กราฟระดับน้ำ
+            const lineBox = document.getElementById('water-level-line-chart');
+            if (lineBox) {
+                const levels = [
+                    { day: 'จ.', val: '7.20' },
+                    { day: 'อ.', val: '7.85' },
+                    { day: 'พ.', val: '8.40' },
+                    { day: 'พฤ.', val: '9.10' },
+                    { day: 'ศ.', val: '8.90' },
+                    { day: 'ส.', val: '8.30' },
+                    { day: 'อา.', val: '8.15' }
+                ];
 
-            box.innerHTML = `
-                <div class="user-welcome-card" style="background: #1e293b;">
-                    <h3>${item.id}</h3>
-                    <p>${item.type}</p>
-                </div>
-                <div class="incident-card">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                        <span style="font-size:0.8rem; font-weight:700;">สถานที่เกิดเหตุ</span>
-                        <span class="status-badge ${item.badgeClass}">${item.badge}</span>
+                lineBox.innerHTML = levels.map(l => {
+                    const heightPct = (parseFloat(l.val) / 10.36) * 100;
+                    return `
+                        <div class="line-col">
+                            <span class="line-val">${l.val}ม.</span>
+                            <div class="line-bar" style="height: ${heightPct}%;"></div>
+                            <span class="line-label">${l.day}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // คำนวณสัดส่วนประเภทปัญหาจริง
+            const ratioContainer = document.getElementById('analytics-dynamic-ratio');
+            if (ratioContainer) {
+                const total = incidents.length || 1;
+                const types = [
+                    'น้ำท่วมขังผิวจราจร (รถเล็กสัญจรลำบาก)',
+                    'น้ำเอ่อล้นตลิ่งเข้าท่วมบ้านเรือน/ชุมชน',
+                    'ท่อระบายน้ำอุดตัน น้ำระบายไม่ทัน'
+                ];
+
+                ratioContainer.innerHTML = types.map(t => {
+                    const count = incidents.filter(i => i.title === t).length;
+                    const pct = Math.round((count / total) * 100);
+                    return `
+                        <div class="bar-item">
+                            <div class="bar-info">
+                                <span>${t}</span>
+                                <span>${count} เคส (${pct}%)</span>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: ${pct}%; background: var(--primary);"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // รายการจุดเสี่ยงสำคัญ
+            const riskContainer = document.getElementById('analytics-risk-list');
+            if (riskContainer) {
+                riskContainer.innerHTML = `
+                    <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px; font-size: 0.72rem; margin-bottom: 6px;">
+                        🚨 <b>ตลิ่งริมแม่น้ำน่าน ชุมชนป่ามะม่วง:</b> ระดับเสี่ยงเฝ้าระวัง 8.50 ม.
                     </div>
-                    <div class="incident-loc"><i class="fa-solid fa-location-dot"></i> ${item.loc}</div>
-                    <div style="font-size: 0.75rem; color: var(--text-dark); margin-bottom: 8px;"><b>พิกัด:</b> ${item.lat}, ${item.lng}</div>
-                    <div style="font-size: 0.75rem; color: var(--text-dark); margin-bottom: 12px;"><b>รายละเอียด:</b> ${item.desc}</div>
-                    ${item.image ? `<div style="margin-bottom:12px;"><img src="${item.image}" style="width:100%; border-radius:8px; border:1px solid var(--border);"></div>` : ''}
-                    <button class="btn-primary" onclick="openGoogleMap('${item.lat}', '${item.lng}', '${item.loc}')">
-                        <i class="fa-solid fa-map-location-dot"></i> เปิดเส้นทางผ่าน Google Maps
-                    </button>
-                </div>
-                <button class="btn-primary" style="background: var(--danger); margin-top: 10px;" onclick="deleteIncident(${index})">
-                    <i class="fa-solid fa-trash"></i> ลบรายการแจ้งเหตุนี้
-                </button>
-            `;
-            switchScreen('screen-detail');
-        }
+                    <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px; font-size: 0.72rem; margin-bottom: 6px;">
+                        🚨 <b>ท่อระบายน้ำลอดวงเวียนรถไฟ:</b> เร่งระบายน้ำต่อเนื่อง
+                    </div>
+                `;
+            }
 
-        function deleteIncident(index) {
-            if (confirm('คุณต้องการลบรายการแจ้งเหตุนี้ใช่หรือไม่?')) {
-                incidents.splice(index, 1);
-                saveToStorage();
-                renderAllViews();
-                showToast('ลบรายการเรียบร้อยแล้ว');
-                switchScreen('screen-status');
+            // สถานะเครื่องสูบน้ำ
+            const pumpsContainer = document.getElementById('analytics-pumps-list');
+            if (pumpsContainer) {
+                pumpsContainer.innerHTML = `
+                    <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px; font-size: 0.72rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span>สถานีสูบน้ำประตูคลองโคกช้าง</span>
+                        <span class="status-badge success">เปิดเครื่อง 4/4</span>
+                    </div>
+                    <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px; font-size: 0.72rem; display: flex; justify-content: space-between; align-items: center;">
+                        <span>สถานีสูบน้ำสะพานสุพรรณกัลยา</span>
+                        <span class="status-badge success">เปิดเครื่อง 2/2</span>
+                    </div>
+                `;
             }
         }
 
-        function openGoogleMap(lat, lng, label) {
-            const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-            window.open(url, '_blank');
-        }
+        // --- 11. Event Onload ---
+        window.onload = function() {
+            initData();
+            if (currentUser) {
+                updateUserUI();
+                switchScreen('screen-home');
+            } else {
+                switchScreen('screen-login-select');
+            }
+        };
     </script>
 </body>
 </html>
